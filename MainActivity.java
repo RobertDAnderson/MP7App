@@ -54,12 +54,31 @@ public class MainActivity extends AppCompatActivity {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET,
                 "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
-                null,null,null);
+                null,
+                new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(final JSONObject response) {
+                TextView display = findViewById(R.id.deckID);
+
+                Log.d(TAG, response.toString());
+                try {
+                    Log.d(TAG, response.toString(2));
+                    display.setText(response.toString(2));
+                } catch (JSONException ignored) { }
+            }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(final VolleyError error) {
+                Log.e(TAG, error.toString());
+            }
+        });
         JsonParser parser = new JsonParser();
-        JsonObject deckIDgetter = parser.parse().getAsJsonObject();
+        JsonObject deckIDgetter = parser.parse(String.valueOf(jsonObjectRequest)).getAsJsonObject();
         if (deckIDgetter.has("deck_id")) {
-            deckIDgetter = deckIDgetter.get("metadata").getAsJsonObject();
+            deckIDgetter = deckIDgetter.get("deck_id").getAsJsonObject();
             String deckID = deckIDgetter.toString();
+            TextView id = findViewById(R.id.deckID);
+            id.setText(deckID);
         }
 
     }
