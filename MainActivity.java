@@ -13,12 +13,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
@@ -29,31 +24,53 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MP7:Main";
-
     public final String deckID = " ";
-
-    private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        requestQueue = Volley.newRequestQueue(this);
+
         setContentView(R.layout.activity_main);
-        // https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(final JSONObject response) {
+                        Log.e("Response", response.toString());
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(final VolleyError error) {
+                Log.e("Response", error.toString());
+            }
+        });
 
+        requestQueue.add(jsonObjectRequest);
+        JsonParser parser = new JsonParser();
+        JsonObject deckIDgetter = parser.parse(String.valueOf(jsonObjectRequest)).getAsJsonObject();
+        if (deckIDgetter.has("deck_id")) {
+            deckIDgetter = deckIDgetter.get("deck_id").getAsJsonObject();
+            String deckID = deckIDgetter.toString();
+            TextView id = findViewById(R.id.deckID);
+            id.setText(deckID);
 
-
+        }
     }
 
     protected void onPause() {
         super.onPause();
     }
 
-    public void onClickNew(final View press) {
+    public void onClickNew(final View view) {
         Toast.makeText(getApplicationContext(),
                 "New deck of 52 shuffled and dealt. Ready to play.",
                 Toast.LENGTH_LONG).show();
-        getID(press);
+        getID();
     }
 
     /**
@@ -72,30 +89,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void getID(final View press) {
+    public void getID() {
         // start a new game and save the ID. almost working.... i think
-
+/*
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET,
                 "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
                 null,
                 new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(final JSONObject response) {
-                TextView display = findViewById(R.id.deckID);
+                    @Override
+                    public void onResponse(final JSONObject response) {
+                        Log.e("Response", response.toString());
+                    }
+                }
+                , new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(final VolleyError error) {
+                        Log.e("Response", error.toString());
+                    }
+                });
 
-                Log.d(TAG, response.toString());
-                try {
-                    Log.d(TAG, response.toString(2));
-                    display.setText(response.toString(2));
-                } catch (JSONException ignored) { }
-            }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(final VolleyError error) {
-                Log.e(TAG, error.toString());
-            }
-        });
+        requestQueue.add(jsonObjectRequest);
         JsonParser parser = new JsonParser();
         JsonObject deckIDgetter = parser.parse(String.valueOf(jsonObjectRequest)).getAsJsonObject();
         if (deckIDgetter.has("deck_id")) {
@@ -104,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             TextView id = findViewById(R.id.deckID);
             id.setText(deckID);
         }
-
+*/
     }
 
     public void startWar(final View press) {
@@ -123,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG).show();
     }
 
-    public void war() {
+    public void nextMove() {
         // Draw bottom card from each deck.
         // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/player1/draw/?count=1
         // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/player2/draw/?count=1
@@ -159,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
         // if playerCardValue = computerCardValue, Toast "Stalemate! Play again!"
         //	play again, put these two cards in the winner's deck.
     }
-
 
 
     //get code
