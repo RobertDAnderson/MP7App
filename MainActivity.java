@@ -14,6 +14,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,14 +29,31 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MP7:Main";
+
     public final String deckID = " ";
+
+    private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestQueue = Volley.newRequestQueue(this);
         setContentView(R.layout.activity_main);
         // https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1
 
+
+
+    }
+
+    protected void onPause() {
+        super.onPause();
+    }
+
+    public void onClickNew(final View press) {
+        Toast.makeText(getApplicationContext(),
+                "New deck of 52 shuffled and dealt. Ready to play.",
+                Toast.LENGTH_LONG).show();
+        getID(press);
     }
 
     /**
@@ -48,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void getID() {
+    public void getID(final View press) {
         // start a new game and save the ID. almost working.... i think
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
