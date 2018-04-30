@@ -24,7 +24,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MP7:Main";
-    public final String deckID = " ";
+    public String deckID = "";
     private static RequestQueue requestQueue;
 
 
@@ -72,7 +72,34 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(),
                 "New deck of 52 shuffled and dealt. Ready to play.",
                 Toast.LENGTH_LONG).show();
-        getID();
+        try {
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    Request.Method.GET,
+                    "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
+                    null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(final JSONObject response) {
+                            TextView display = findViewById(R.id.deckID);
+                            Log.d(TAG, response.toString());
+                            getID(response.toString());
+
+                            try {
+                                Log.d(TAG, response.toString(2));
+                                display.setText(response.toString(2));
+                            } catch (JSONException ignored) {
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(final VolleyError error) {
+                    Log.e(TAG, error.toString());
+                }
+            });
+            requestQueue.add(jsonObjectRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -91,36 +118,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void getID() {
-
-        try {
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                    Request.Method.GET,
-                    "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
-                    null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(final JSONObject response) {
-                            TextView display = findViewById(R.id.deckID);
-
-                            Log.d(TAG, response.toString());
-
-                            try {
-                                Log.d(TAG, response.toString(2));
-                                display.setText(response.toString(2));
-                            } catch (JSONException ignored) { }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(final VolleyError error) {
-                    Log.e(TAG, error.toString());
-                }
-            });
-            requestQueue.add(jsonObjectRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void getID(final String json) {
+        JsonParser parser = new JsonParser();
+        JsonObject jsonobj = parser.parse(json).getAsJsonObject();
+        deckID = jsonobj.get("deck_id").getAsString();
+        Log.d(TAG, deckID);
     }
+
+
     public void startWar(final View press) {
 
 
