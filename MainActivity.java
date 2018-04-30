@@ -25,14 +25,17 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MP7:Main";
     public final String deckID = " ";
+    private static RequestQueue requestQueue;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        requestQueue = Volley.newRequestQueue(this);
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
+/*
+
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET,
                 "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
@@ -40,13 +43,11 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(final JSONObject response) {
-                        Log.e("Response", response.toString());
                     }
                 }
                 , new Response.ErrorListener() {
             @Override
             public void onErrorResponse(final VolleyError error) {
-                Log.e("Response", error.toString());
             }
         });
 
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             id.setText(deckID);
 
         }
+        */
     }
 
     protected void onPause() {
@@ -90,37 +92,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getID() {
-        // start a new game and save the ID. almost working.... i think
-/*
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(final JSONObject response) {
-                        Log.e("Response", response.toString());
-                    }
+
+        try {
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    Request.Method.GET,
+                    "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
+                    null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(final JSONObject response) {
+                            TextView display = findViewById(R.id.deckID);
+
+                            Log.d(TAG, response.toString());
+
+                            try {
+                                Log.d(TAG, response.toString(2));
+                                display.setText(response.toString(2));
+                            } catch (JSONException ignored) { }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(final VolleyError error) {
+                    Log.e(TAG, error.toString());
                 }
-                , new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(final VolleyError error) {
-                        Log.e("Response", error.toString());
-                    }
-                });
-
-        requestQueue.add(jsonObjectRequest);
-        JsonParser parser = new JsonParser();
-        JsonObject deckIDgetter = parser.parse(String.valueOf(jsonObjectRequest)).getAsJsonObject();
-        if (deckIDgetter.has("deck_id")) {
-            deckIDgetter = deckIDgetter.get("deck_id").getAsJsonObject();
-            String deckID = deckIDgetter.toString();
-            TextView id = findViewById(R.id.deckID);
-            id.setText(deckID);
+            });
+            requestQueue.add(jsonObjectRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-*/
     }
-
     public void startWar(final View press) {
 
 
@@ -133,8 +133,7 @@ public class MainActivity extends AppCompatActivity {
         // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/pot/
 
         // Card images to card backs png
-        Toast.makeText(getApplicationContext(), "game reset",
-                Toast.LENGTH_LONG).show();
+
     }
 
     public void nextMove() {
