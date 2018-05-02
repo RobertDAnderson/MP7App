@@ -1,11 +1,13 @@
 package edu.illinois.cs.cs125.mp7app;
 
+import android.media.Image;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,6 +50,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         player1remaining[0] = 26;
         player2remaining[0] = 26;
+        TextView player2remain = findViewById(R.id.computerCountValue);
+        player2remain.setText(String.valueOf(player2remaining[0]));
+        TextView player1remain = findViewById(R.id.playerCountValue);
+        player1remain.setText(String.valueOf(player1remaining[0]));
+
+
+
 
     }
 
@@ -56,6 +65,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickNew(final View view) {
+        setContentView(R.layout.activity_main);
+        Button war = findViewById(R.id.warButton);
+        war.setEnabled(true);
+        player1remaining[0] = 26;
+        player2remaining[0] = 26;
+        TextView player2remain = findViewById(R.id.computerCountValue);
+        player2remain.setText(String.valueOf(player2remaining[0]));
+        TextView player1remain = findViewById(R.id.playerCountValue);
+        player1remain.setText(String.valueOf(player1remaining[0]));
+        if (player1remaining[0] == 0) {
+                                    ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                                    player1CardImagebg.setImageResource(R.drawable.empty);
+                                }
+                                if (player1remaining[0] > 0) {
+                                    ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                                    player1CardImagebg.setImageResource(R.drawable.bicycledark);
+
+                                }
+                                if (player2remaining[0] == 0) {
+                                    ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                                    player2CardImagebg.setImageResource(R.drawable.empty);
+                                }
+                                if (player2remaining[0] > 0) {
+                                    ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                                    player2CardImagebg.setImageResource(R.drawable.bicycledark);
+                                    }
+
+
 
         try {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -87,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                             try {
-                                Log.d(TAG, "fuck" + response.toString(2));
+                                Log.d(TAG, "f: " + response.toString(2));
                                 display.setText(deckID);
                             } catch (JSONException ignored) {
 
@@ -116,19 +153,50 @@ public class MainActivity extends AppCompatActivity {
 
     public void nextMove(final View view) {
 
+        player1remaining[0] -= 1;
+        player2remaining[0] -= 1;
+        TextView player2remain = findViewById(R.id.computerCountValue);
+        player2remain.setText(String.valueOf(player2remaining[0]));
+        TextView player1remain = findViewById(R.id.playerCountValue);
+        player1remain.setText(String.valueOf(player1remaining[0]));
+
         if (isSomeoneZero(player1remaining[0], player2remaining[0])) {
             Toast toast = Toast.makeText(getApplicationContext(), "LAST CARD!",
                     Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
-            if (player1remaining[0] == 0) {
+            if (player1remaining[0] == 0 && player2remaining[0] != 0) {
                 ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
                 player1CardImagebg.setImageResource(R.drawable.empty);
             }
-            if (player2remaining[0] == 0) {
+            if (player1remaining[0] > 0) {
+                ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                player1CardImagebg.setImageResource(R.drawable.bicycledark);
+
+            }
+            if (player2remaining[0] == 0 && player1remaining[0] != 0) {
                 ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
                 player2CardImagebg.setImageResource(R.drawable.empty);
             }
+            if (player2remaining[0] > 0) {
+                ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                player2CardImagebg.setImageResource(R.drawable.bicycledark);
+            }
+            // easter egg
+            if (player1remaining[0] == 0 && player2remaining[0] == 0) {
+                Button war = findViewById(R.id.warButton);
+                war.setEnabled(false);
+                android.support.constraint.ConstraintLayout a = (android.support.constraint.ConstraintLayout) findViewById(R.id.backg);
+                a.setBackgroundResource(R.drawable.back_iheartjava);
+                player1remain.setText(" ");
+                player2remain.setText(" ");
+                ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                player1CardImagebg.setImageResource(R.drawable.actuallyempty);
+                ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                player2CardImagebg.setImageResource(R.drawable.actuallyempty);
+
+
+                }
 
         }
 
@@ -238,14 +306,23 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     toast0.cancel();
                 }
-            }, 500);
+            }, 400);
             if (player1remaining[0] == 0) {
                 ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
                 player1CardImagebg.setImageResource(R.drawable.empty);
             }
+            if (player1remaining[0] > 0) {
+                ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                player1CardImagebg.setImageResource(R.drawable.bicycledark);
+
+            }
             if (player2remaining[0] == 0) {
                 ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
                 player2CardImagebg.setImageResource(R.drawable.empty);
+            }
+            if (player2remaining[0] > 0) {
+                ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                player2CardImagebg.setImageResource(R.drawable.bicycledark);
             }
 
         }
@@ -254,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void compare(final int player1Value, final int player2Value, final String player1Code, final String player2Code) {
         Log.d(TAG, player1Value + "//" + player2Value + "//" + player1Code + "//" + player2Code);
-        if (player1Value > player2Value) {
+        if (player1Value > player2Value && player2remaining[0] != 0) {
             try {
                 JsonObjectRequest jsonObjectRequest5 = new JsonObjectRequest(
                         Request.Method.GET,
@@ -264,8 +341,16 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(final JSONObject response) {
                                 Log.d(TAG, player1Code + " and " + player2Code + " added to player 1's pile.");
+
                                 player1remaining[0] += 2;
-                                player2remaining[0] -= 2;
+
+                                TextView player2remain = findViewById(R.id.computerCountValue);
+                                player2remain.setText(String.valueOf(player2remaining[0]));
+                                TextView player1remain = findViewById(R.id.playerCountValue);
+                                player1remain.setText(String.valueOf(player1remaining[0]));
+
+
+
                                 final Toast toast1 = Toast.makeText(getApplicationContext(), "Player 1 won!",
                                         Toast.LENGTH_SHORT);
                                 toast1.setGravity(Gravity.LEFT, 0, 0);
@@ -276,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
                                     public void run() {
                                         toast1.cancel();
                                     }
-                                }, 500);
+                                }, 400);
 
                             }
                         }, new Response.ErrorListener() {
@@ -290,7 +375,34 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        if (player1Value < player2Value) {
+        if (player1Value > player2Value && player2remaining[0] == 0) {
+            Log.d(TAG, player1Code + " and " + player2Code + " added to player 1's pile.");
+
+            player1remaining[0] += 2;
+
+            TextView player1remain = findViewById(R.id.playerCountValue);
+            player1remain.setText(String.valueOf(player1remaining[0]));
+            ImageView player2cardimage = findViewById(R.id.player2CardImage);
+            player2cardimage.setImageResource(R.drawable.empty);
+            Button war = findViewById(R.id.warButton);
+            war.setEnabled(false);
+
+            final Toast toast1 = Toast.makeText(getApplicationContext(), "PLAYER 1 WINS THE WAR!",
+                    Toast.LENGTH_SHORT);
+            toast1.setGravity(Gravity.LEFT, 0, 0);
+            toast1.show();
+
+
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    toast1.cancel();
+                }
+            }, 3000);
+        }
+        if (player1Value < player2Value && player1remaining[0] != 0) {
             try {
                 JsonObjectRequest jsonObjectRequest6 = new JsonObjectRequest(
                         Request.Method.GET,
@@ -299,8 +411,31 @@ public class MainActivity extends AppCompatActivity {
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(final JSONObject response) {
+
                                 player2remaining[0] += 2;
-                                player1remaining[0] -= 2;
+                                if (player1remaining[0] == 0) {
+                                    ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                                    player1CardImagebg.setImageResource(R.drawable.empty);
+                                }
+                                if (player1remaining[0] > 0) {
+                                    ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                                    player1CardImagebg.setImageResource(R.drawable.bicycledark);
+
+                                }
+                                if (player2remaining[0] == 0) {
+                                    ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                                    player2CardImagebg.setImageResource(R.drawable.empty);
+                                }
+                                if (player2remaining[0] > 0) {
+                                    ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                                    player2CardImagebg.setImageResource(R.drawable.bicycledark);
+                                }
+
+                                TextView player2remain = findViewById(R.id.computerCountValue);
+                                player2remain.setText(String.valueOf(player2remaining[0]));
+                                TextView player1remain = findViewById(R.id.playerCountValue);
+                                player1remain.setText(String.valueOf(player1remaining[0]));
+
 
                                 Log.d(TAG, player1Code + " and " + player2Code + " added to player 2's pile.");
                                 final Toast toast2 = Toast.makeText(getApplicationContext(), "Player 2 won!",
@@ -313,7 +448,7 @@ public class MainActivity extends AppCompatActivity {
                                     public void run() {
                                         toast2.cancel();
                                     }
-                                }, 500);
+                                }, 400);
 
                             }
                         }, new Response.ErrorListener() {
@@ -326,7 +461,48 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } if (player1Value == player2Value) {
+        }
+        if (player2Value > player1Value && player1remaining[0] == 0) {
+            Log.d(TAG, player2Code + " and " + player1Code + " added to player 2's pile.");
+
+            player1remaining[0] += 2;
+
+            TextView player2remain = findViewById(R.id.playerCountValue);
+            player2remain.setText(String.valueOf(player2remaining[0]));
+            ImageView player1cardimage = findViewById(R.id.player1CardImage);
+            player1cardimage.setImageResource(R.drawable.empty);
+            if (player1remaining[0] == 0) {
+                ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                player1CardImagebg.setImageResource(R.drawable.empty);
+            }
+            if (player1remaining[0] > 0) {
+                ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                player1CardImagebg.setImageResource(R.drawable.bicycledark);
+
+            }
+            if (player2remaining[0] == 0) {
+                ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                player2CardImagebg.setImageResource(R.drawable.empty);
+            }
+            if (player2remaining[0] > 0) {
+                ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                player2CardImagebg.setImageResource(R.drawable.bicycledark);
+            }
+
+
+            final Toast toast1 = Toast.makeText(getApplicationContext(), "PLAYER 2 WINS THE WAR!",
+                    Toast.LENGTH_SHORT);
+            toast1.setGravity(Gravity.LEFT, 0, 0);
+            toast1.show();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    toast1.cancel();
+                }
+            }, 3000);
+        }
+        if (player1Value == player2Value) {
             try {
                 JsonObjectRequest jsonObjectRequest7 = new JsonObjectRequest(
                         Request.Method.GET,
@@ -336,6 +512,30 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(final JSONObject response) {
                                 Log.d(TAG, player1Code + " added back into player 1's pile.");
+
+                                player1remaining[0] += 1;
+
+                                TextView player2remain = findViewById(R.id.computerCountValue);
+                                player2remain.setText(String.valueOf(player2remaining[0]));
+                                TextView player1remain = findViewById(R.id.playerCountValue);
+                                player1remain.setText(String.valueOf(player1remaining[0]));
+                                if (player1remaining[0] == 0) {
+                                    ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                                    player1CardImagebg.setImageResource(R.drawable.empty);
+                                }
+                                if (player1remaining[0] > 0) {
+                                    ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                                    player1CardImagebg.setImageResource(R.drawable.bicycledark);
+
+                                }
+                                if (player2remaining[0] == 0) {
+                                    ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                                    player2CardImagebg.setImageResource(R.drawable.empty);
+                                }
+                                if (player2remaining[0] > 0) {
+                                    ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                                    player2CardImagebg.setImageResource(R.drawable.bicycledark);
+                                }
 
                                 final Toast toast3 = Toast.makeText(getApplicationContext(), "TIE!",
                                         Toast.LENGTH_SHORT);
@@ -347,7 +547,7 @@ public class MainActivity extends AppCompatActivity {
                                     public void run() {
                                         toast3.cancel();
                                     }
-                                }, 500);
+                                }, 400);
 
                             }
                         }, new Response.ErrorListener() {
@@ -369,6 +569,13 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(final JSONObject response) {
                                 Log.d(TAG, player2Code + " added back into player 2's pile.");
+
+                                player2remaining[0] += 1;
+
+                                TextView player2remain = findViewById(R.id.computerCountValue);
+                                player2remain.setText(String.valueOf(player2remaining[0]));
+                                TextView player1remain = findViewById(R.id.playerCountValue);
+                                player1remain.setText(String.valueOf(player1remaining[0]));
 
                             }
                         }, new Response.ErrorListener() {
@@ -620,7 +827,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    //
     //
     //
     //
