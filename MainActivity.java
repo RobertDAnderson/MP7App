@@ -1,8 +1,10 @@
 package edu.illinois.cs.cs125.mp7app;
 
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,13 +23,22 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//hi there 2
+//  .------..------..------.
+//  |M.--. ||P.--. ||7.--. |
+//  | (\/) || :/\: || :(): |
+//  | :\/: || (__) || ()() |
+//  | '--'M|| '--'P|| '--'7|
+//  `------'`------'`------'
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MP7:Main";
-    public String deckID = "";
+    public String deckID = null;
     private static RequestQueue requestQueue;
+    final int[] player1remaining = new int[1];
+
+    final int[] player2remaining = new int[1];
+
 
 
     @Override
@@ -35,35 +46,9 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-/*
+        player1remaining[0] = 26;
+        player2remaining[0] = 26;
 
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(final JSONObject response) {
-                    }
-                }
-                , new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(final VolleyError error) {
-            }
-        });
-
-        requestQueue.add(jsonObjectRequest);
-        JsonParser parser = new JsonParser();
-        JsonObject deckIDgetter = parser.parse(String.valueOf(jsonObjectRequest)).getAsJsonObject();
-        if (deckIDgetter.has("deck_id")) {
-            deckIDgetter = deckIDgetter.get("deck_id").getAsJsonObject();
-            String deckID = deckIDgetter.toString();
-            TextView id = findViewById(R.id.deckID);
-            id.setText(deckID);
-
-        }
-        */
     }
 
     protected void onPause() {
@@ -80,103 +65,32 @@ public class MainActivity extends AppCompatActivity {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
+                            Log.w(TAG, "call 1: " + response.toString());
                             TextView display = findViewById(R.id.deckID);
                             Log.d(TAG, response.toString());
+
+                            getID(response.toString());
+                            initialTwentySix1();
+                            initialTwentySix2();
+
+
                             Toast.makeText(getApplicationContext(),
                                     "New deck of 52 shuffled and dealt. Ready to play.",
                                     Toast.LENGTH_LONG).show();
-                            getID(response.toString());
-                            String twentysix1 = initialTwentySix();
 
 
-                            try {
-                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                                        Request.Method.GET,
-                                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player1/add/?cards=" + twentysix1,
-                                        null,
-                                        new Response.Listener<JSONObject>() {
-                                            @Override
-                                            public void onResponse(final JSONObject response) {
-                                                Log.d(TAG, "Cards in player1's pile: " + getRemainingPileAdd(response.toString()));
-
-                                            }
-                                        }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(final VolleyError error) {
-                                        Log.e(TAG, error.toString());
-                                    }
-                                });
-                                requestQueue.add(jsonObjectRequest);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            String twentysix2 = initialTwentySix();
-                            try {
-                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                                        Request.Method.GET,
-                                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player2/add/?cards=" + twentysix2,
-                                        null,
-                                        new Response.Listener<JSONObject>() {
-                                            @Override
-                                            public void onResponse(final JSONObject response) {
-                                                Log.d(TAG, "Cards in player2's pile: " + getRemainingPileAdd(response.toString()));
-
-                                            }
-                                        }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(final VolleyError error) {
-                                        Log.e(TAG, error.toString());
-                                    }
-                                });
-                                requestQueue.add(jsonObjectRequest);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            /*
-                            try {
-                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                                        Request.Method.GET,
-                                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/pot/add/?count=0",
-                                        null,
-                                        new Response.Listener<JSONObject>() {
-                                            @Override
-                                            public void onResponse(final JSONObject response) {
-                                                Log.d(TAG, "Cards in the pot: " + getRemaining(response.toString()));
-                                                try {
-                                                    Log.d(TAG, response.toString(2));
-
-                                                } catch (JSONException ignored) { }
-                                            }
-                                        }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(final VolleyError error) {
-                                        Log.e(TAG, error.toString());
-                                    }
-                                });
-                                requestQueue.add(jsonObjectRequest);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            */
-
-                            // Deal 26 to each pile
-                            // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/player1/add/?count=26
-                            // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/player2/add?count=26
-                            //
-                            // initialize a pot pile
-                            // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/pot/add?count=0
-                            //
-                            // reset all images
                             ImageView player1CardImage = (ImageView)findViewById(R.id.player1CardImage);
                             player1CardImage.setImageResource(R.drawable.empty);
                             ImageView player2CardImage = (ImageView)findViewById(R.id.player2CardImage);
                             player2CardImage.setImageResource(R.drawable.empty);
 
 
+
                             try {
-                                Log.d(TAG, response.toString(2));
+                                Log.d(TAG, "fuck" + response.toString(2));
                                 display.setText(deckID);
                             } catch (JSONException ignored) {
+
                             }
                         }
                     }, new Response.ErrorListener() {
@@ -189,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public void getID(final String json) {
@@ -201,37 +116,29 @@ public class MainActivity extends AppCompatActivity {
 
     public void nextMove(final View view) {
 
-        /*
-        String json = getAsJson("https://deckofcardsapi.com/api/deck/" + <<deck_id>> + "/pile/player1/draw/?count=1")
-        player1Pile.draw(1);
-        player1Image.setImage(player1DrawPile.getCode());
-        int player1Value = player1DrawPile.getValue(json);
-        player1DrawPile.addToPile(pot);
-
-        json = getAsJson("https://deckofcardsapi.com/api/deck/" + <<deck_id>> + "/pile/player2/draw/?count=1")
-        player2Pile.draw(1);
-        player2Image.setImage(player2DrawPile.getCode());
-        int player2Value = player2DrawPile.getValue(json);
-        player1DrawPile.addToPile(pot);
-
-        if (player1Value > player2Value) {
-            pot.addToPile(player1Pile);
-            if (player2Pile.getRemaining <= 0) {
-                //CODE FOR DECLARING WINNER HERE//
+        if (isSomeoneZero(player1remaining[0], player2remaining[0])) {
+            Toast toast = Toast.makeText(getApplicationContext(), "LAST CARD!",
+                    Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            if (player1remaining[0] == 0) {
+                ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                player1CardImagebg.setImageResource(R.drawable.empty);
             }
-            return;
-        } else if (player2Value > player1Value) {
-            pot.addToPile(player2Pile);
-            if (player1Pile.getRemaining <= 0) {
-                //CODE FOR DECLARING WINNER HERE//
+            if (player2remaining[0] == 0) {
+                ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                player2CardImagebg.setImageResource(R.drawable.empty);
             }
-            return;
+
         }
-        war(press);
-         */
+
+
+        // value placeholders
         final int[] player1Value = new int[1];
-        final String[] player1Code = new String[1];
         final int[] player2Value = new int[1];
+
+        // code placeholders
+        final String[] player1Code = new String[1];
         final String[] player2Code = new String[1];
 
         // image updaters
@@ -239,33 +146,9 @@ public class MainActivity extends AppCompatActivity {
         final String[] img2id = new String[1];
 
         try {
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            JsonObjectRequest jsonObjectRequest3 = new JsonObjectRequest(
                     Request.Method.GET,
-                    "https://deckofcardsapi.com/api/deck/" + deckID + "/draw/?count=3",
-                    null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(final JSONObject response) {
-
-                            Log.d(TAG, "The list is: " + response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(final VolleyError error) {
-                    Log.e(TAG, error.toString());
-                }
-            });
-            requestQueue.add(jsonObjectRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
-        try {
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                    Request.Method.GET,
-                    "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player1/draw/?count=1/bottom/",
+                    "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player1/draw/bottom/?count=1",
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -275,14 +158,20 @@ public class MainActivity extends AppCompatActivity {
                             JsonObject jsonobj = parser.parse(response.toString()).getAsJsonObject();
                             JsonArray card = jsonobj.get("cards").getAsJsonArray();
                             jsonobj = card.get(0).getAsJsonObject();
+                            Log.w(TAG, jsonobj.toString());
                             // value getter
                             player1Value[0] = getValue(jsonobj.get("value").getAsString());
+                            Log.w(TAG, "P1 value: " + jsonobj.get("value").getAsString());
                             // code getter
                             player1Code[0] = getCode(response.toString(), 0);
+                            Log.w(TAG, "P1 code: " + getCode(response.toString(), 0));
                             // image getter
                             img1id[0] = getImageFileString(getCode(response.toString(), 0));
                             ImageView player1CardImage = findViewById(R.id.player1CardImage);
-                            player1CardImage.setImageResource(getResources().getIdentifier(img1id[0],"drawable", getPackageName()));
+                            player1CardImage.setImageResource(getResources().getIdentifier(img1id[0], "drawable", getPackageName()));
+                            if (player1Value[0] != 0 && player2Value[0] != 0 && player1Code[0] != null && player2Code[0] != null) {
+                                compare(player1Value[0], player2Value[0], player1Code[0], player2Code[0]);
+                            }
 
 
                             Log.d(TAG, "The value of Player 1's card is: " + player1Value[0]);
@@ -293,14 +182,14 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, error.toString());
                 }
             });
-            requestQueue.add(jsonObjectRequest);
+            requestQueue.add(jsonObjectRequest3);
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            JsonObjectRequest jsonObjectRequest4 = new JsonObjectRequest(
                     Request.Method.GET,
-                    "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player2/draw/?count=1/bottom/",
+                    "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player2/draw//bottom/?count=1",
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -311,16 +200,19 @@ public class MainActivity extends AppCompatActivity {
                             jsonobj = card.get(0).getAsJsonObject();
                             // value getter
                             player2Value[0] = getValue(jsonobj.get("value").getAsString());
+                            Log.w(TAG, "P2 value: " + jsonobj.get("value").getAsString());
                             // code getter
                             player2Code[0] = getCode(response.toString(), 0);
+                            Log.w(TAG, "P2 code: " + getCode(response.toString(), 0));
                             // image getter
                             img2id[0] = getImageFileString(getCode(response.toString(), 0));
                             ImageView player2CardImage = findViewById(R.id.player2CardImage);
-                            player2CardImage.setImageResource(getResources().getIdentifier(img2id[0],"drawable", getPackageName()));
-
-
+                            player2CardImage.setImageResource(getResources().getIdentifier(img2id[0], "drawable", getPackageName()));
 
                             Log.d(TAG, "The value of Player 2's card is: " + player2Value[0]);
+                            if (player1Value[0] != 0 && player2Value[0] != 0 && player1Code[0] != null && player2Code[0] != null) {
+                                compare(player1Value[0], player2Value[0], player1Code[0], player2Code[0]);
+                            }
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -328,20 +220,63 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, error.toString());
                 }
             });
-            requestQueue.add(jsonObjectRequest);
+            requestQueue.add(jsonObjectRequest4);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (player1Value[0] > player2Value[0]) {
+
+
+        if (isSomeoneZero(player1remaining[0], player2remaining[0])) {
+            final Toast toast0 = Toast.makeText(getApplicationContext(), "LAST CARD!",
+                    Toast.LENGTH_SHORT);
+            toast0.setGravity(Gravity.CENTER, 0, 0);
+            toast0.show();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    toast0.cancel();
+                }
+            }, 500);
+            if (player1remaining[0] == 0) {
+                ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+                player1CardImagebg.setImageResource(R.drawable.empty);
+            }
+            if (player2remaining[0] == 0) {
+                ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+                player2CardImagebg.setImageResource(R.drawable.empty);
+            }
+
+        }
+
+    }
+
+    public void compare(final int player1Value, final int player2Value, final String player1Code, final String player2Code) {
+        Log.d(TAG, player1Value + "//" + player2Value + "//" + player1Code + "//" + player2Code);
+        if (player1Value > player2Value) {
             try {
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                JsonObjectRequest jsonObjectRequest5 = new JsonObjectRequest(
                         Request.Method.GET,
-                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player1/add/?cards=" + player1Code[0] + "," + player2Code[0],
+                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player1/add/?cards=" + player1Code + "," + player2Code,
                         null,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(final JSONObject response) {
-                                Log.d(TAG, player1Code[0] + " and " + player2Code[0] + " added to player 1's pile.");
+                                Log.d(TAG, player1Code + " and " + player2Code + " added to player 1's pile.");
+                                player1remaining[0] += 2;
+                                player2remaining[0] -= 2;
+                                final Toast toast1 = Toast.makeText(getApplicationContext(), "Player 1 won!",
+                                        Toast.LENGTH_SHORT);
+                                toast1.setGravity(Gravity.LEFT, 0, 0);
+                                toast1.show();
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        toast1.cancel();
+                                    }
+                                }, 500);
 
                             }
                         }, new Response.ErrorListener() {
@@ -350,21 +285,35 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, error.toString());
                     }
                 });
-                requestQueue.add(jsonObjectRequest);
+                requestQueue.add(jsonObjectRequest5);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if (player1Value[0] < player2Value[0]) {
+        if (player1Value < player2Value) {
             try {
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                JsonObjectRequest jsonObjectRequest6 = new JsonObjectRequest(
                         Request.Method.GET,
-                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player2/add/?cards=" + player1Code[0] + "," + player2Code[0],
+                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player2/add/?cards=" + player1Code + "," + player2Code,
                         null,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(final JSONObject response) {
-                                Log.d(TAG, player1Code[0] + " and " + player2Code[0] + " added to player 2's pile.");
+                                player2remaining[0] += 2;
+                                player1remaining[0] -= 2;
+
+                                Log.d(TAG, player1Code + " and " + player2Code + " added to player 2's pile.");
+                                final Toast toast2 = Toast.makeText(getApplicationContext(), "Player 2 won!",
+                                        Toast.LENGTH_SHORT);
+                                toast2.setGravity(Gravity.RIGHT, 0, 0);
+                                toast2.show();
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        toast2.cancel();
+                                    }
+                                }, 500);
 
                             }
                         }, new Response.ErrorListener() {
@@ -373,20 +322,32 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, error.toString());
                     }
                 });
-                requestQueue.add(jsonObjectRequest);
+                requestQueue.add(jsonObjectRequest6);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } if (player1Value[0] == player2Value[0]) {
+        } if (player1Value == player2Value) {
             try {
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                JsonObjectRequest jsonObjectRequest7 = new JsonObjectRequest(
                         Request.Method.GET,
-                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player1/add/?cards=" + player1Code[0],
+                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player1/add/?cards=" + player1Code,
                         null,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(final JSONObject response) {
-                                Log.d(TAG, player1Code[0] + "added back into player 1's pile.");
+                                Log.d(TAG, player1Code + " added back into player 1's pile.");
+
+                                final Toast toast3 = Toast.makeText(getApplicationContext(), "TIE!",
+                                        Toast.LENGTH_SHORT);
+                                toast3.setGravity(Gravity.CENTER, 0, 0);
+                                toast3.show();
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        toast3.cancel();
+                                    }
+                                }, 500);
 
                             }
                         }, new Response.ErrorListener() {
@@ -395,19 +356,19 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, error.toString());
                     }
                 });
-                requestQueue.add(jsonObjectRequest);
+                requestQueue.add(jsonObjectRequest7);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                JsonObjectRequest jsonObjectRequest8 = new JsonObjectRequest(
                         Request.Method.GET,
-                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player2/add/?cards=" + player2Code[0],
+                        "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player2/add/?cards=" + player2Code,
                         null,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(final JSONObject response) {
-                                Log.d(TAG, player2Code[0] + "added back into player 2's pile.");
+                                Log.d(TAG, player2Code + " added back into player 2's pile.");
 
                             }
                         }, new Response.ErrorListener() {
@@ -416,54 +377,11 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, error.toString());
                     }
                 });
-                requestQueue.add(jsonObjectRequest);
+                requestQueue.add(jsonObjectRequest8);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
-        // Draw bottom card from each deck.
-        // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/player1/draw/?count=1
-        // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/player2/draw/?count=1
-        // get value of player 1's card
-        //      convert value string to int p1value
-        //      save code as string p1code, add to pot list[0]
-        // get value of player 2's card
-        //      convert value string to int p2value
-        //      save code as string p2code, add to pot list[1]
-        // add p1code and p2code to pot list
-        // https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/pot/add/?cards=p1code,p2code
-        // if p1value > p2value
-        //      recurse through pot list add all cards in pot list to pile player1
-        //      https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/player1/add/?cards=p1code,p2code
-        //      clear list
-        // if p1value > p2value
-        //      recurse through pot list add all cards in pot list to pile player1
-        //      https://deckofcardsapi.com/api/deck/<<deck_id>>/pile/player2/add/?cards=p1code,p2code
-        //      clear list
-        // if p1value == p2value
-        //
-
-
-        // Display each player's card on their card image
-        //
-        // comparing the cards
-        // if Player 1 value > Player 2 value,
-        /*
-        Toast.makeText(getApplicationContext(), "Player 1 won!",
-                Toast.LENGTH_LONG).show();
-
-        // put both cards into Player 1's deck
-        //
-        // if Player 1 value < Player 2 value,
-
-        Toast.makeText(getApplicationContext(), "Player 2 won!",
-                Toast.LENGTH_LONG).show();
-        */
-        // put both cards into Player 2's deck
-        //
-        // if playerCardValue = computerCardValue, Toast "Stalemate! Play again!"
-        //	play again, put these two cards in the winner's deck.
     }
 
     //get code - gets the two letter code for each card to use when placing in the pot pile.
@@ -475,7 +393,6 @@ public class MainActivity extends AppCompatActivity {
         JsonObject cardobj;
         cardobj = cardsArray.get(index).getAsJsonObject();
         String code = cardobj.get("code").getAsString();
-        Log.d(TAG, "The drawn card's code is: " + code);
         return code;
     }
 
@@ -486,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
         imgFileString = code.toLowerCase();
         StringBuilder sb = new StringBuilder(imgFileString);
         sb.insert(0, 'i');
-        Log.d(TAG, imgFileString);
+        imgFileString = sb.toString();
         return imgFileString;
 
 
@@ -510,9 +427,8 @@ public class MainActivity extends AppCompatActivity {
     public int getValue(final String json) {
         String value;
         int valueInt = 0;
-        JsonParser parser = new JsonParser();
-        JsonObject jsonobj = parser.parse(json).getAsJsonObject();
-        value = jsonobj.get("value").getAsString();
+
+        value = json;
         if (value.equals("ACE")) {
             valueInt = 14;
         }
@@ -552,7 +468,6 @@ public class MainActivity extends AppCompatActivity {
         if (value.equals("2")) {
             valueInt = 2;
         }
-        Log.d(TAG, "The value of this card is: " + valueInt);
         return valueInt;
 
     }
@@ -585,24 +500,29 @@ public class MainActivity extends AppCompatActivity {
         JsonObject jsonobj = parser.parse(json).getAsJsonObject();
         remaining = jsonobj.get("remaining").getAsInt();
 
-        Log.d(TAG, "Cards remaining in pile after calling getRemainingPileAdd: " + remaining);
+
         return remaining;
+    }
+
+    public boolean isSomeoneZero(final int p1, final int p2) {
+        return (p1 == 0 || p2 == 0);
     }
 
     public void getRemainingUpdate() {
 
     }
-    public String initialTwentySix() {
+    public void initialTwentySix1() {
         String ts = "";
         final StringBuilder sb = new StringBuilder(ts);
         try {
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            JsonObjectRequest jsonObjectTS1 = new JsonObjectRequest(
                     Request.Method.GET,
                     "https://deckofcardsapi.com/api/deck/" + deckID + "/draw/?count=26",
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
+                            Log.w(TAG, "call 2: " + response.toString());
                             String ts = "";
 
                             for (int i = 0; i < 26; i++) {
@@ -613,7 +533,26 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             ts = sb.toString();
-                            Log.d(TAG, "Cards drawn: " + ts);
+                            Log.d(TAG, "Cards drawn from deck to give to player 1: " + ts);
+                            JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(
+                                    Request.Method.GET,
+                                    "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player1/add/?cards=" + ts + "/",
+                                    null,
+                                    new Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(final JSONObject response) {
+                                            Log.d(TAG, "Cards remaining in player1's pile: " + getRemainingPileAdd(response.toString()));
+                                            Log.w(TAG, "call 3: " + response.toString());
+
+                                        }
+                                    }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(final VolleyError error) {
+                                    Log.e(TAG, error.toString());
+                                }
+                            });
+                            requestQueue.add(jsonObjectRequest1);
+
 
                         }
                     }, new Response.ErrorListener() {
@@ -622,10 +561,67 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, error.toString());
                 }
             });
-            requestQueue.add(jsonObjectRequest);
+            requestQueue.add(jsonObjectTS1);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ts;
     }
+    public void initialTwentySix2() {
+        String ts = "";
+        final StringBuilder sb = new StringBuilder(ts);
+        try {
+            JsonObjectRequest jsonObjectTS2 = new JsonObjectRequest(
+                    Request.Method.GET,
+                    "https://deckofcardsapi.com/api/deck/" + deckID + "/draw/?count=26",
+                    null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(final JSONObject response) {
+                            Log.w(TAG, "call 4: " + response.toString());
+                            String ts = "";
+
+                            for (int i = 0; i < 26; i++) {
+                                if (i == 0) {
+                                    sb.insert(0, (getCode(response.toString(), i)));
+                                } else {
+                                    sb.insert(0, (getCode(response.toString(), i) + ","));
+                                }
+                            }
+                            ts = sb.toString();
+                            Log.d(TAG, "Cards drawn from deck to give to player 2: " + ts);
+                            JsonObjectRequest jsonObjectRequest2 = new JsonObjectRequest(
+                                    Request.Method.GET,
+                                    "https://deckofcardsapi.com/api/deck/" + deckID + "/pile/player2/add/?cards=" + ts + "/",
+                                    null,
+                                    new Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(final JSONObject response2) {
+                                            Log.d(TAG, "Cards remaining in player2's pile: " + getRemainingPileAdd(response2.toString()));
+                                            Log.w(TAG, "call 5: " + response.toString());
+
+                                        }
+                                    }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(final VolleyError error) {
+                                    Log.e(TAG, error.toString());
+                                }
+                            });
+                            requestQueue.add(jsonObjectRequest2);
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(final VolleyError error) {
+                    Log.e(TAG, error.toString());
+                }
+            });
+            requestQueue.add(jsonObjectTS2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    //
+    //
+    //
+    //
 }
