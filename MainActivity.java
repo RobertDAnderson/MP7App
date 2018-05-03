@@ -1,5 +1,6 @@
 package edu.illinois.cs.cs125.mp7app;
 
+import android.graphics.Color;
 import android.media.Image;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -48,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        player1remaining[0] = 0;
-        player2remaining[0] = 0;
+        player1remaining[0] = 26;
+        player2remaining[0] = 26;
         TextView player2remain = findViewById(R.id.computerCountValue);
         player2remain.setText(String.valueOf(player2remaining[0]));
         TextView player1remain = findViewById(R.id.playerCountValue);
@@ -168,9 +169,12 @@ public class MainActivity extends AppCompatActivity {
 
         player1remaining[0] -= 1;
         player2remaining[0] -= 1;
+
         TextView player2remain = findViewById(R.id.computerCountValue);
+        player2remain.setTextColor(Color.WHITE);
         player2remain.setText(String.valueOf(player2remaining[0]));
         TextView player1remain = findViewById(R.id.playerCountValue);
+        player1remain.setTextColor(Color.WHITE);
         player1remain.setText(String.valueOf(player1remaining[0]));
 
         if (isSomeoneZero(player1remaining[0], player2remaining[0])) {
@@ -397,9 +401,11 @@ public class MainActivity extends AppCompatActivity {
         if (player1Value > player2Value && player2remaining[0] == 0) {
             Log.d(TAG, player1Code + " and " + player2Code + " added to player 1's pile.");
 
+
             player1remaining[0] += 2;
 
             TextView player1remain = findViewById(R.id.playerCountValue);
+            player1remain.setTextColor(Color.YELLOW);
             player1remain.setText(String.valueOf(player1remaining[0]));
             ImageView player2cardimage = findViewById(R.id.player2CardImage);
             player2cardimage.setImageResource(R.drawable.empty);
@@ -487,6 +493,7 @@ public class MainActivity extends AppCompatActivity {
             player1remaining[0] += 2;
 
             TextView player2remain = findViewById(R.id.playerCountValue);
+            player2remain.setTextColor(Color.YELLOW);
             player2remain.setText(String.valueOf(player2remaining[0]));
             ImageView player1cardimage = findViewById(R.id.player1CardImage);
             player1cardimage.setImageResource(R.drawable.empty);
@@ -745,7 +752,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean isSomeoneZero(final int p1, final int p2) {
         return (p1 == 0 || p2 == 0);
     }
-    
+
     //    _       _ _   _       _ ____   __
     //   (_)_ __ (_) |_(_) __ _| |___ \ / /_
     //   | | '_ \| | __| |/ _` | | __) | '_ \
@@ -861,7 +868,4 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    //
-    //
-    //
 }
