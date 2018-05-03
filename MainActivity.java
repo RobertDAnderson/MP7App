@@ -48,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        player1remaining[0] = 26;
-        player2remaining[0] = 26;
+        player1remaining[0] = 0;
+        player2remaining[0] = 0;
         TextView player2remain = findViewById(R.id.computerCountValue);
         player2remain.setText(String.valueOf(player2remaining[0]));
         TextView player1remain = findViewById(R.id.playerCountValue);
@@ -64,6 +64,12 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    //                 ____ _ _      _    _   _
+    //     ___  _ __  / ___| (_) ___| | _| \ | | _____      __
+    //    / _ \| '_ \| |   | | |/ __| |/ /  \| |/ _ \ \ /\ / /
+    //   | (_) | | | | |___| | | (__|   <| |\  |  __/\ V  V /
+    //    \___/|_| |_|\____|_|_|\___|_|\_\_| \_|\___| \_/\_/
+    //
     public void onClickNew(final View view) {
         setContentView(R.layout.activity_main);
         Button war = findViewById(R.id.warButton);
@@ -72,25 +78,24 @@ public class MainActivity extends AppCompatActivity {
         player2remaining[0] = 26;
         TextView player2remain = findViewById(R.id.computerCountValue);
         player2remain.setText(String.valueOf(player2remaining[0]));
-        TextView player1remain = findViewById(R.id.playerCountValue);
+        final TextView player1remain = findViewById(R.id.playerCountValue);
         player1remain.setText(String.valueOf(player1remaining[0]));
         if (player1remaining[0] == 0) {
-                                    ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
-                                    player1CardImagebg.setImageResource(R.drawable.empty);
-                                }
-                                if (player1remaining[0] > 0) {
-                                    ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
-                                    player1CardImagebg.setImageResource(R.drawable.bicycledark);
-
-                                }
-                                if (player2remaining[0] == 0) {
-                                    ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
-                                    player2CardImagebg.setImageResource(R.drawable.empty);
-                                }
-                                if (player2remaining[0] > 0) {
-                                    ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
-                                    player2CardImagebg.setImageResource(R.drawable.bicycledark);
-                                    }
+            ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+            player1CardImagebg.setImageResource(R.drawable.empty);
+        }
+        if (player1remaining[0] > 0) {
+            ImageView player1CardImagebg = (ImageView) findViewById(R.id.Player1DeckImageBackground);
+            player1CardImagebg.setImageResource(R.drawable.bicycledark);
+        }
+        if (player2remaining[0] == 0) {
+            ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+            player2CardImagebg.setImageResource(R.drawable.empty);
+        }
+        if (player2remaining[0] > 0) {
+            ImageView player2CardImagebg = (ImageView) findViewById(R.id.Player2DeckImageBackground);
+            player2CardImagebg.setImageResource(R.drawable.bicycledark);
+        }
 
 
 
@@ -110,18 +115,14 @@ public class MainActivity extends AppCompatActivity {
                             initialTwentySix1();
                             initialTwentySix2();
 
-
                             Toast.makeText(getApplicationContext(),
-                                    "New deck of 52 shuffled and dealt. Ready to play.",
+                                    "New deck of " + (player1remaining[0] + player2remaining[0]) + " shuffled and dealt. Ready to play.",
                                     Toast.LENGTH_LONG).show();
-
 
                             ImageView player1CardImage = (ImageView)findViewById(R.id.player1CardImage);
                             player1CardImage.setImageResource(R.drawable.empty);
                             ImageView player2CardImage = (ImageView)findViewById(R.id.player2CardImage);
                             player2CardImage.setImageResource(R.drawable.empty);
-
-
 
                             try {
                                 Log.d(TAG, "f: " + response.toString(2));
@@ -143,6 +144,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //               _   ___ ____
+    //     __ _  ___| |_|_ _|  _ \
+    //    / _` |/ _ \ __|| || | | |
+    //   | (_| |  __/ |_ | || |_| |
+    //    \__, |\___|\__|___|____/
+    //    |___/
+    //
     public void getID(final String json) {
         JsonParser parser = new JsonParser();
         JsonObject jsonobj = parser.parse(json).getAsJsonObject();
@@ -150,7 +158,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "The deck's ID is: " + deckID);
     }
 
-
+    //                    _   __  __
+    //    _ __   _____  _| |_|  \/  | _____   _____
+    //   | '_ \ / _ \ \/ / __| |\/| |/ _ \ \ / / _ \
+    //   | | | |  __/>  <| |_| |  | | (_) \ V /  __/
+    //   |_| |_|\___/_/\_\\__|_|  |_|\___/ \_/ \___|
+    //
     public void nextMove(final View view) {
 
         player1remaining[0] -= 1;
@@ -329,6 +342,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //     ___ ___  _ __ ___  _ __   __ _ _ __ ___
+    //    / __/ _ \| '_ ` _ \| '_ \ / _` | '__/ _ \
+    //   | (_| (_) | | | | | | |_) | (_| | | |  __/
+    //    \___\___/|_| |_| |_| .__/ \__,_|_|  \___|
+    //                       |_|
+    //
     public void compare(final int player1Value, final int player2Value, final String player1Code, final String player2Code) {
         Log.d(TAG, player1Value + "//" + player2Value + "//" + player1Code + "//" + player2Code);
         if (player1Value > player2Value && player2remaining[0] != 0) {
@@ -591,6 +610,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //               _    ____          _
+    //     __ _  ___| |_ / ___|___   __| | ___
+    //    / _` |/ _ \ __| |   / _ \ / _` |/ _ \
+    //   | (_| |  __/ |_| |__| (_) | (_| |  __/
+    //    \__, |\___|\__|\____\___/ \__,_|\___|
+    //    |___/
     //get code - gets the two letter code for each card to use when placing in the pot pile.
     public String getCode(final String json, final int index) {
         JsonParser parser = new JsonParser();
@@ -603,7 +628,12 @@ public class MainActivity extends AppCompatActivity {
         return code;
     }
 
-
+    //               _   ___
+    //     __ _  ___| |_|_ _|_ __ ___   __ _  __ _  ___ / _(_) | ___/ ___|| |_ _ __(_)_ __   __ _
+    //    / _` |/ _ \ __|| || '_ ` _ \ / _` |/ _` |/ _ \ |_| | |/ _ \___ \| __| '__| | '_ \ / _` |
+    //   | (_| |  __/ |_ | || | | | | | (_| | (_| |  __/  _| | |  __/___) | |_| |  | | | | | (_| |
+    //    \__, |\___|\__|___|_| |_| |_|\__,_|\__, |\___|_| |_|_|\___|____/ \__|_|  |_|_| |_|\__, |
+    //    |___/                              |___/                                          |___/
     //get image -- get the image filepath of the card to be displayed
     public String getImageFileString(final String code) {
         String imgFileString;
@@ -615,21 +645,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    // set image -- change the image on the activity_main.xml to the current card.
-    public void setImage(final String json, final int player) {
-        if (player == 1) {
-            String code = getImageFileString(getCode(json, 0));
-            ImageView player1CardImage = findViewById(R.id.player1CardImage);
-            player1CardImage.setImageResource(getResources().getIdentifier(code,"drawable", getPackageName()));
-        }
-        if (player == 2) {
-            String code = getImageFileString(getCode(json, 0));
-            ImageView player2CardImage = findViewById(R.id.player2CardImage);
-            player2CardImage.setImageResource(getResources().getIdentifier(code,"drawable", getPackageName()));
-        }
 
-    }
-
+    //               _ __     __    _
+    //     __ _  ___| |\ \   / /_ _| |_   _  ___
+    //    / _` |/ _ \ __\ \ / / _` | | | | |/ _ \
+    //   | (_| |  __/ |_ \ V / (_| | | |_| |  __/
+    //    \__, |\___|\__| \_/ \__,_|_|\__,_|\___|
+    //    |___/
     //get value -- look at "value" json object and get an int based on the card value
     public int getValue(final String json) {
         String value;
@@ -679,16 +701,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //get remaining -- get the remaining cards of each deck
-    public int getRemaining(final String json) {
-        int remaining;
-        JsonParser parser = new JsonParser();
-        JsonObject jsonobj = parser.parse(json).getAsJsonObject();
-        remaining = jsonobj.get("remaining").getAsInt();
-        Log.d(TAG, "Cards remaining: " + remaining);
-        return remaining;
-    }
-
+    //               _   ____                      _       _             ____  _ _
+    //     __ _  ___| |_|  _ \ ___ _ __ ___   __ _(_)_ __ (_)_ __   __ _|  _ \(_) | ___
+    //    / _` |/ _ \ __| |_) / _ \ '_ ` _ \ / _` | | '_ \| | '_ \ / _` | |_) | | |/ _ \
+    //   | (_| |  __/ |_|  _ <  __/ | | | | | (_| | | | | | | | | | (_| |  __/| | |  __/
+    //    \__, |\___|\__|_| \_\___|_| |_| |_|\__,_|_|_| |_|_|_| |_|\__, |_|   |_|_|\___|
+    //    |___/                                                    |___/
     public int getRemainingPile(final String json, final String id) {
         int remaining;
         JsonParser parser = new JsonParser();
@@ -701,6 +719,13 @@ public class MainActivity extends AppCompatActivity {
         return remaining;
     }
 
+    //               _   ____                      _       _             ____  _ _         _       _     _
+    //     __ _  ___| |_|  _ \ ___ _ __ ___   __ _(_)_ __ (_)_ __   __ _|  _ \(_) | ___   / \   __| | __| |
+    //    / _` |/ _ \ __| |_) / _ \ '_ ` _ \ / _` | | '_ \| | '_ \ / _` | |_) | | |/ _ \ / _ \ / _` |/ _` |
+    //   | (_| |  __/ |_|  _ <  __/ | | | | | (_| | | | | | | | | | (_| |  __/| | |  __// ___ \ (_| | (_| |
+    //    \__, |\___|\__|_| \_\___|_| |_| |_|\__,_|_|_| |_|_|_| |_|\__, |_|   |_|_|\___/_/   \_\__,_|\__,_|
+    //    |___/                                                    |___/
+    //
     public int getRemainingPileAdd(final String json) {
         int remaining;
         JsonParser parser = new JsonParser();
@@ -711,13 +736,22 @@ public class MainActivity extends AppCompatActivity {
         return remaining;
     }
 
+    //    _     ____                                        _____
+    //   (_)___/ ___|  ___  _ __ ___   ___  ___  _ __   ___|__  /___ _ __ ___
+    //   | / __\___ \ / _ \| '_ ` _ \ / _ \/ _ \| '_ \ / _ \ / // _ \ '__/ _ \
+    //   | \__ \___) | (_) | | | | | |  __/ (_) | | | |  __// /|  __/ | | (_) |
+    //   |_|___/____/ \___/|_| |_| |_|\___|\___/|_| |_|\___/____\___|_|  \___/
+    //
     public boolean isSomeoneZero(final int p1, final int p2) {
         return (p1 == 0 || p2 == 0);
     }
-
-    public void getRemainingUpdate() {
-
-    }
+    
+    //    _       _ _   _       _ ____   __
+    //   (_)_ __ (_) |_(_) __ _| |___ \ / /_
+    //   | | '_ \| | __| |/ _` | | __) | '_ \
+    //   | | | | | | |_| | (_| | |/ __/| (_) |
+    //   |_|_| |_|_|\__|_|\__,_|_|_____|\___/
+    //
     public void initialTwentySix1() {
         String ts = "";
         final StringBuilder sb = new StringBuilder(ts);
